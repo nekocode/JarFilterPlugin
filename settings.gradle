@@ -1,6 +1,6 @@
 include ':gradle-plugin'
 
-boolean exclude = false
+boolean exclude = true
 
 final File excludeFile = new File("exclude")
 if (!exclude && !excludeFile.exists()) {

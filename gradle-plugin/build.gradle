@@ -37,7 +37,20 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.nekocode'
 archivesBaseName='JarFilterPlugin'
-version='local'
+
+if (project.findProperty('local') == 'true') {
+    version='local'
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: uri('.maven'))
+            }
+        }
+
+        finalizedBy(clean)
+    }
+}
 
 // build a jar with source files
 task sourcesJar(type: Jar) {
@@ -47,14 +60,4 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives sourcesJar
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('.maven'))
-        }
-    }
-
-    finalizedBy(clean)
 }
