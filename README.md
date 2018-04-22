@@ -3,7 +3,7 @@
 
 This plugin can filter files (such as class files) inside a jar. This is very useful when you want to modify some classes in a third-party library but do not want to download and import all of its source code. Just copy the source files you want to modify into your project. And then use this plugin to remove the corresponding class in the jar. Finally, the build tool will package the compiled class of your copied source into the archive.
 
-You can see the [example](example) to learn how to use this plugin.
+You can see the [example](example) to learn how to use it. In addition, this plugin supports incremental work. So its performance is good.
 
 ## Intergation
 
