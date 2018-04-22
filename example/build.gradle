@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+apply plugin: 'jar-filter'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven { url project(':gradle-plugin').file('.maven').toURI() }
+    }
+    dependencies {
+        classpath 'com.github.nekocode:JarFilterPlugin:local'
+    }
+}
+
+jarFilter {
+    skipFiles = [
+            'android/support/v7/app/AppCompatActivity(.*).class',
+            'android/support/v7/app/AppCompatActivity\$(.*).class'
+    ]
+}
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "cn.nekocode.jarfilter.example"
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+}
