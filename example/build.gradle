@@ -23,8 +23,8 @@ buildscript {
 
 jarFilter {
     skipFiles = [
-            'android/support/v7/app/AppCompatActivity(.*).class',
-            'android/support/v7/app/AppCompatActivity\$(.*).class'
+            'android/support/v7/app/AppCompatActivity.class',
+            'android/support/v7/app/AppCompatActivity\\$(.*).class'
     ]
 }
 

@@ -20,13 +20,15 @@ buildscript {
 }
 ```
 
-Configure the plugin:
+Apply and configure the plugin:
 
 ```gralde
+apply plugin: 'jar-filter'
+
 jarFilter {
     skipFiles = [
-            'android/support/v7/app/AppCompatActivity(.*).class',
-            'android/support/v7/app/AppCompatActivity\$(.*).class'
+            'android/support/v7/app/AppCompatActivity.class',
+            'android/support/v7/app/AppCompatActivity\\$(.*).class'
     ]
 }
 ```
