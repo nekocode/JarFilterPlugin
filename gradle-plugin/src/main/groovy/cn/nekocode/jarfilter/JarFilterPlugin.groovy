@@ -34,8 +34,11 @@ class JarFilterPlugin implements Plugin<Project> {
 
         def android = project.getExtensions().getByName("android")
 
-        if (android instanceof AppExtension) {
+        if (android != null && android instanceof AppExtension) {
             ((AppExtension) android).registerTransform(new JarFilterTransform(project))
+
+        } else {
+            throw new RuntimeException("The JarFilterPlugin can only be used in android application module.")
         }
     }
 }
