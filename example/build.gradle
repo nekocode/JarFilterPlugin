@@ -3,21 +3,12 @@ apply plugin: 'jar-filter'
 
 buildscript {
     repositories {
+        maven { url project(':gradle-plugin').file('.maven').toURI() }
         google()
         jcenter()
-
-        if (!'true'.equalsIgnoreCase(project.findProperty('local'))) {
-            maven { url "https://jitpack.io" }
-        } else {
-            maven { url project(':gradle-plugin').file('.maven').toURI() }
-        }
     }
     dependencies {
-        if (!'true'.equalsIgnoreCase(project.findProperty('local'))) {
-            classpath 'com.github.nekocode:JarFilterPlugin:+'
-        } else {
-            classpath 'com.github.nekocode:JarFilterPlugin:local'
-        }
+        classpath 'com.github.nekocode:JarFilterPlugin:local'
     }
 }
 

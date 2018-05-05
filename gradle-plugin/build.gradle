@@ -38,7 +38,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.nekocode'
 archivesBaseName='JarFilterPlugin'
 
-if ('true'.equalsIgnoreCase(project.findProperty('local'))) {
+if (findProject(':example') != null) {
     version='local'
 
     uploadArchives {

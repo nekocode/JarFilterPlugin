@@ -1,10 +1,8 @@
 include ':gradle-plugin'
 
-boolean exclude = false
+boolean isLocal = false
 
-final File excludeFile = new File("exclude")
-if (!exclude && !excludeFile.exists()) {
+final File isLocalFile = new File("isLocal")
+if (isLocal || isLocalFile.exists()) {
     include ':example'
-} else {
-    excludeFile.delete()
 }
