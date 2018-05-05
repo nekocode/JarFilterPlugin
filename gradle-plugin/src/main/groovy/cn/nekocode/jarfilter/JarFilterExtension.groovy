@@ -20,14 +20,23 @@ package cn.nekocode.jarfilter
  * @author nekocode (nekocode.cn@gmail.com)
  */
 class JarFilterExtension {
-    private List<String> skipFiles = new ArrayList<>()
+    private Set<String> includes = new LinkedHashSet<>()
+    private Set<String> excludes = new LinkedHashSet<>()
 
 
-    List<String> getSkipFiles() {
-        return skipFiles
+    Set<String> getIncludes() {
+        return includes
     }
 
-    void setSkipFiles(List<String> skipFiles) {
-        this.skipFiles = skipFiles
+    void setIncludes(Collection<String> includes) {
+        this.includes = includes.toSet()
+    }
+
+    Set<String> getExcludes() {
+        return excludes
+    }
+
+    void setExcludes(Collection<String> excludes) {
+        this.excludes = excludes.toSet()
     }
 }

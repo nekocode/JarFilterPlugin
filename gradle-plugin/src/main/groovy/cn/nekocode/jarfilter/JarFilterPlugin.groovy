@@ -21,6 +21,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
+ * Debug command: ./gradlew -Dorg.gradle.daemon=false -Dorg.gradle.debug=true :example:build
+ *
  * @author nekocode (nekocode.cn@gmail.com)
  */
 class JarFilterPlugin implements Plugin<Project> {
@@ -30,7 +32,7 @@ class JarFilterPlugin implements Plugin<Project> {
         project.extensions.create('jarFilter', JarFilterExtension)
 
         project.getTasks()['preBuild']
-                .dependsOn(project.tasks.create('updateFilterListFile', UpdateFilterListFileTask))
+                .dependsOn(project.tasks.create('updateFilterFiles', UpdateFilterFilesTask))
 
         def android = project.getExtensions().getByName("android")
 

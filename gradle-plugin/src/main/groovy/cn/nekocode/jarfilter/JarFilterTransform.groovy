@@ -31,18 +31,22 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
+import static cn.nekocode.jarfilter.UpdateFilterFilesTask.EXCLUDES_FILE_NAME
+import static cn.nekocode.jarfilter.UpdateFilterFilesTask.INCLUDES_FILE_NAME
+
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 class JarFilterTransform extends Transform {
     private final Project project
-    private final File listFile
+    private final File includesFile
+    private final File excludesFile
 
 
     JarFilterTransform(Project project) {
         this.project = project
-        listFile = new File(
-                project.getBuildDir(), UpdateFilterListFileTask.FILTER_FILE_NAME)
+        includesFile = new File(project.getBuildDir(), INCLUDES_FILE_NAME)
+        excludesFile = new File(project.getBuildDir(), EXCLUDES_FILE_NAME)
     }
 
     @NonNull
@@ -67,7 +71,7 @@ class JarFilterTransform extends Transform {
     @Override
     Collection<SecondaryFile> getSecondaryFiles() {
         return ImmutableSet.of(
-                SecondaryFile.nonIncremental(project.files(listFile))
+                SecondaryFile.nonIncremental(project.files(includesFile, excludesFile))
         )
     }
 
@@ -83,20 +87,35 @@ class JarFilterTransform extends Transform {
         final TransformOutputProvider outputProvider = invocation.getOutputProvider()
         assert outputProvider != null
 
-        final List<Pattern> filterList =
-                listFile.collect().stream()
+        final List<Pattern> includes =
+                includesFile.collect().stream()
                         .filter { line -> !line.isAllWhitespace() }
                         .map { str -> Pattern.compile(str) }
                         .collect()
-        final Predicate<String> skipFilter = { path ->
-            for (Pattern pattern : filterList) {
+        final Predicate<String> includeFilter = { path ->
+            if (includes.isEmpty()) return true
+            for (Pattern pattern : includes) {
                 if (pattern.matcher(path).matches()) {
                     return true
                 }
             }
-
             return false
         }
+
+        final List<Pattern> excludes =
+                excludesFile.collect().stream()
+                        .filter { line -> !line.isAllWhitespace() }
+                        .map { str -> Pattern.compile(str) }
+                        .collect()
+        final Predicate<String> excludeFilter = { path ->
+            for (Pattern pattern : excludes) {
+                if (pattern.matcher(path).matches()) {
+                    return true
+                }
+            }
+            return false
+        }
+
 
         if (!invocation.isIncremental()) {
             outputProvider.deleteAll()
@@ -117,7 +136,7 @@ class JarFilterTransform extends Transform {
                             break
                         case Status.ADDED:
                         case Status.CHANGED:
-                            copyAndFilterJar(jarInput.file, outJar, skipFilter)
+                            copyAndFilterJar(jarInput.file, outJar, includeFilter, excludeFilter)
                             break
                         case Status.REMOVED:
                             FileUtils.deleteIfExists(outJar)
@@ -125,22 +144,28 @@ class JarFilterTransform extends Transform {
                     }
 
                 } else {
-                    copyAndFilterJar(jarInput.file, outJar, skipFilter)
+                    copyAndFilterJar(jarInput.file, outJar, includeFilter, excludeFilter)
                 }
             }
         }
     }
 
     private static void copyAndFilterJar(
-            File inJarFile, File outJarFile, Predicate<String> skipFilter) {
+            File inJarFile, File outJarFile,Predicate<String> includeFilter,
+            Predicate<String> excludeFilter) {
 
         new ZipInputStream(new FileInputStream(inJarFile)).withCloseable { zis ->
             new ZipOutputStream(new FileOutputStream(outJarFile)).withCloseable { zos ->
 
                 ZipEntry entry
                 while ((entry = zis.getNextEntry()) != null) {
-                    if (skipFilter.test(entry.getName())) {
-                        // Skip this file's copying
+                    if (!includeFilter.test(entry.getName())) {
+                        // Skip this file
+                        continue
+                    }
+
+                    if (excludeFilter.test(entry.getName())) {
+                        // Skip this file
                         continue
                     }
 

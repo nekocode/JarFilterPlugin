@@ -23,35 +23,43 @@ import org.gradle.api.tasks.TaskAction
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-class UpdateFilterListFileTask extends DefaultTask {
-    public static final String FILTER_FILE_NAME = 'jar-filter-list.txt'
+class UpdateFilterFilesTask extends DefaultTask {
+    public static final String INCLUDES_FILE_NAME = 'jar-filter-includes.txt'
+    public static final String EXCLUDES_FILE_NAME = 'jar-filter-excludes.txt'
 
 
     @TaskAction
     void update() {
         final JarFilterExtension extension =
                 project.extensions.getByName('jarFilter')
-        final List<String> list =
-                extension.skipFiles.stream()
-                        .filter { line -> !line.isAllWhitespace() }
-                        .collect()
 
-        final File listFile = new File(project.getBuildDir(), FILTER_FILE_NAME)
-        boolean needUpdate = !listFile.exists()
+        updateSetFile(extension.includes,
+                new File(project.getBuildDir(), INCLUDES_FILE_NAME))
+        updateSetFile(extension.excludes,
+                new File(project.getBuildDir(), EXCLUDES_FILE_NAME))
+    }
+
+    private static void updateSetFile(Set<String> set, File setFile) {
+        final Set<String> setToSave =
+                set.stream()
+                        .filter { line -> !line.isAllWhitespace() }
+                        .collect().toSet()
+
+        boolean needUpdate = !setFile.exists()
 
         if (!needUpdate) {
-            final List<String> listInFile =
-                    listFile.collect().stream()
+            final Set<String> setFromFile =
+                    setFile.collect().stream()
                             .filter { line -> !line.isAllWhitespace() }
-                            .collect()
+                            .collect().toSet()
 
-            needUpdate = (list.toSet() != listInFile.toSet())
+            needUpdate = (setToSave != setFromFile)
         }
 
         if (needUpdate) {
-            Files.createParentDirs(listFile)
-            listFile.withWriter('utf-8') { writer ->
-                for (String line : list) {
+            Files.createParentDirs(setFile)
+            setFile.withWriter('utf-8') { writer ->
+                for (String line : setToSave) {
                     writer.write(line + '\n')
                 }
             }
