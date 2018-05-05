@@ -6,15 +6,15 @@ buildscript {
         google()
         jcenter()
 
-        if (project.findProperty('local') != 'true') {
+        if (!'true'.equalsIgnoreCase(project.findProperty('local'))) {
             maven { url "https://jitpack.io" }
         } else {
             maven { url project(':gradle-plugin').file('.maven').toURI() }
         }
     }
     dependencies {
-        if (project.findProperty('local') != 'true') {
-            classpath 'com.github.nekocode:JarFilterPlugin:1.1'
+        if (!'true'.equalsIgnoreCase(project.findProperty('local'))) {
+            classpath 'com.github.nekocode:JarFilterPlugin:+'
         } else {
             classpath 'com.github.nekocode:JarFilterPlugin:local'
         }
