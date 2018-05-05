@@ -26,7 +26,8 @@ Apply and configure the plugin:
 apply plugin: 'jar-filter'
 
 jarFilter {
-    skipFiles = [
+    // includes = [...]
+    excludes = [
             'android/support/v7/app/AppCompatActivity.class',
             'android/support/v7/app/AppCompatActivity\\$(.*).class'
     ]
