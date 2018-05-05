@@ -92,28 +92,31 @@ class JarFilterTransform extends Transform {
                         .filter { line -> !line.isAllWhitespace() }
                         .map { str -> Pattern.compile(str) }
                         .collect()
-        final Predicate<String> includeFilter = { path ->
-            if (includes.isEmpty()) return true
-            for (Pattern pattern : includes) {
-                if (pattern.matcher(path).matches()) {
-                    return true
-                }
-            }
-            return false
-        }
-
         final List<Pattern> excludes =
                 excludesFile.collect().stream()
                         .filter { line -> !line.isAllWhitespace() }
                         .map { str -> Pattern.compile(str) }
                         .collect()
-        final Predicate<String> excludeFilter = { path ->
-            for (Pattern pattern : excludes) {
-                if (pattern.matcher(path).matches()) {
-                    return true
+
+        final Predicate<String> filter = { path ->
+            boolean isInclude = includes.isEmpty()
+
+            if (!isInclude) {
+                for (Pattern pattern : includes) {
+                    if (pattern.matcher(path).matches()) {
+                        isInclude = true
+                        break
+                    }
                 }
             }
-            return false
+            if (!isInclude) return false
+
+            for (Pattern pattern : excludes) {
+                if (pattern.matcher(path).matches()) {
+                    return false
+                }
+            }
+            return true
         }
 
 
@@ -136,7 +139,7 @@ class JarFilterTransform extends Transform {
                             break
                         case Status.ADDED:
                         case Status.CHANGED:
-                            copyAndFilterJar(jarInput.file, outJar, includeFilter, excludeFilter)
+                            copyAndFilterJar(jarInput.file, outJar, filter)
                             break
                         case Status.REMOVED:
                             FileUtils.deleteIfExists(outJar)
@@ -144,27 +147,21 @@ class JarFilterTransform extends Transform {
                     }
 
                 } else {
-                    copyAndFilterJar(jarInput.file, outJar, includeFilter, excludeFilter)
+                    copyAndFilterJar(jarInput.file, outJar, filter)
                 }
             }
         }
     }
 
     private static void copyAndFilterJar(
-            File inJarFile, File outJarFile,Predicate<String> includeFilter,
-            Predicate<String> excludeFilter) {
+            File inJarFile, File outJarFile, Predicate<String> filter) {
 
         new ZipInputStream(new FileInputStream(inJarFile)).withCloseable { zis ->
             new ZipOutputStream(new FileOutputStream(outJarFile)).withCloseable { zos ->
 
                 ZipEntry entry
                 while ((entry = zis.getNextEntry()) != null) {
-                    if (!includeFilter.test(entry.getName())) {
-                        // Skip this file
-                        continue
-                    }
-
-                    if (excludeFilter.test(entry.getName())) {
+                    if (!filter.test(entry.getName())) {
                         // Skip this file
                         continue
                     }
