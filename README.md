@@ -25,11 +25,19 @@ Apply and configure the plugin:
 ```gralde
 apply plugin: 'jar-filter'
 
-jarFilter {
-    // includes = [...]
-    excludes = [
-            'android/support/v7/app/AppCompatActivity.class',
-            'android/support/v7/app/AppCompatActivity\\$(.*).class'
-    ]
+jarFilters {
+    "com.android.support:appcompat-v7:(.*)" {
+        excludes = [
+                'android/support/v7/app/AppCompatActivity.class',
+                'android/support/v7/app/AppCompatActivity\\$(.*).class'
+        ]
+    }
+
+    // Local jar
+    "android.local.jars:xxx.jar:(.*)" {
+        includes = [
+                'xxx'
+        ]
+    }
 }
 ```
