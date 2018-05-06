@@ -23,30 +23,26 @@ import com.android.utils.FileUtils
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Sets
 import com.google.common.io.ByteStreams
+import groovy.json.JsonSlurper
 import org.gradle.api.Project
 
-import java.util.function.Predicate
-import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-import static cn.nekocode.jarfilter.UpdateFilterFilesTask.EXCLUDES_FILE_NAME
-import static cn.nekocode.jarfilter.UpdateFilterFilesTask.INCLUDES_FILE_NAME
+import static UpdateFiltersFileTask.FILTERS_FILE_NAME
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 class JarFilterTransform extends Transform {
     private final Project project
-    private final File includesFile
-    private final File excludesFile
+    private final File filtersFile
 
 
     JarFilterTransform(Project project) {
         this.project = project
-        includesFile = new File(project.getBuildDir(), INCLUDES_FILE_NAME)
-        excludesFile = new File(project.getBuildDir(), EXCLUDES_FILE_NAME)
+        filtersFile = new File(project.getBuildDir(), FILTERS_FILE_NAME)
     }
 
     @NonNull
@@ -71,7 +67,7 @@ class JarFilterTransform extends Transform {
     @Override
     Collection<SecondaryFile> getSecondaryFiles() {
         return ImmutableSet.of(
-                SecondaryFile.nonIncremental(project.files(includesFile, excludesFile))
+                SecondaryFile.nonIncremental(project.files(filtersFile))
         )
     }
 
@@ -87,37 +83,10 @@ class JarFilterTransform extends Transform {
         final TransformOutputProvider outputProvider = invocation.getOutputProvider()
         assert outputProvider != null
 
-        final List<Pattern> includes =
-                includesFile.collect().stream()
-                        .filter { line -> !line.isAllWhitespace() }
-                        .map { str -> Pattern.compile(str) }
-                        .collect()
-        final List<Pattern> excludes =
-                excludesFile.collect().stream()
-                        .filter { line -> !line.isAllWhitespace() }
-                        .map { str -> Pattern.compile(str) }
-                        .collect()
-
-        final Predicate<String> filter = { path ->
-            boolean isInclude = includes.isEmpty()
-
-            if (!isInclude) {
-                for (Pattern pattern : includes) {
-                    if (pattern.matcher(path).matches()) {
-                        isInclude = true
-                        break
-                    }
-                }
-            }
-            if (!isInclude) return false
-
-            for (Pattern pattern : excludes) {
-                if (pattern.matcher(path).matches()) {
-                    return false
-                }
-            }
-            return true
-        }
+        final List list = new JsonSlurper().parse(filtersFile.readBytes())
+        final JarFilters filters = new JarFilters(
+                list.stream().map { JarFilter.fromMap(it) }.collect().toSet()
+        )
 
 
         if (!invocation.isIncremental()) {
@@ -126,20 +95,13 @@ class JarFilterTransform extends Transform {
 
         invocation.inputs.each { input ->
             input.jarInputs.each { jarInput ->
-                final File outJar = outputProvider.getContentLocation(
-                        jarInput.name,
-                        jarInput.contentTypes,
-                        jarInput.scopes,
-                        Format.JAR
-                )
-
                 if (invocation.isIncremental()) {
                     switch (jarInput.status) {
                         case Status.NOTCHANGED:
                             break
                         case Status.ADDED:
                         case Status.CHANGED:
-                            copyAndFilterJar(jarInput.file, outJar, filter)
+                            copyAndFilterJar(outputProvider, jarInput, filters)
                             break
                         case Status.REMOVED:
                             FileUtils.deleteIfExists(outJar)
@@ -147,16 +109,25 @@ class JarFilterTransform extends Transform {
                     }
 
                 } else {
-                    copyAndFilterJar(jarInput.file, outJar, filter)
+                    copyAndFilterJar(outputProvider, jarInput, filters)
                 }
             }
         }
     }
 
-    private static void copyAndFilterJar(
-            File inJarFile, File outJarFile, Predicate<String> filter) {
+    private static void copyAndFilterJar(TransformOutputProvider outputProvider,
+            JarInput jarInput, JarFilters filters) {
 
-        new ZipInputStream(new FileInputStream(inJarFile)).withCloseable { zis ->
+        final File outJarFile = outputProvider.getContentLocation(
+                jarInput.name,
+                jarInput.contentTypes,
+                jarInput.scopes,
+                Format.JAR
+        )
+
+        final JarFilters.FileFilter filter = filters.getFileFilter(jarInput.name)
+
+        new ZipInputStream(new FileInputStream(jarInput.file)).withCloseable { zis ->
             new ZipOutputStream(new FileOutputStream(outJarFile)).withCloseable { zos ->
 
                 ZipEntry entry

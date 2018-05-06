@@ -12,11 +12,13 @@ buildscript {
     }
 }
 
-jarFilter {
-    excludes = [
-            'android/support/v7/app/AppCompatActivity.class',
-            'android/support/v7/app/AppCompatActivity\\$(.*).class'
-    ]
+jarFilters {
+    "com.android.support:appcompat-v7:(.*)" {
+        excludes = [
+                'android/support/v7/app/AppCompatActivity.class',
+                'android/support/v7/app/AppCompatActivity\\$(.*).class'
+        ]
+    }
 }
 
 android {

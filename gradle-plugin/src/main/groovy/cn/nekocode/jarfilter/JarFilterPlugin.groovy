@@ -29,10 +29,10 @@ class JarFilterPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.extensions.create('jarFilter', JarFilterExtension)
+        project.extensions.add('jarFilters', project.container(JarFilter))
 
         project.getTasks()['preBuild']
-                .dependsOn(project.tasks.create('updateFilterFiles', UpdateFilterFilesTask))
+                .dependsOn(project.tasks.create('updateJarFiltersFile', UpdateFiltersFileTask))
 
         def android = project.getExtensions().getByName("android")
 
