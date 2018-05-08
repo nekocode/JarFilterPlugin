@@ -1,5 +1,10 @@
 include ':gradle-plugin'
 
-if (new File("isLocal").exists()) {
-    include ':example'
+if (new File('local').exists()) {
+    final File firstBuild = new File('first-build')
+    if (!firstBuild.exists()) {
+        include ':example'
+    } else {
+        firstBuild.delete()
+    }
 }

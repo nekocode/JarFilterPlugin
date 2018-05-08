@@ -41,3 +41,11 @@ jarFilters {
     }
 }
 ```
+
+## Build
+
+If you want to build in your local. You need to run the following command after cloning.
+
+```sh
+touch local first-build && ./gradlew uploadArchives
+```

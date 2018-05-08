@@ -10,4 +10,5 @@
 *.apk
 *.jobf
 .maven
-isLocal
+local
+first-build
