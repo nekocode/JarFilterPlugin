@@ -127,6 +127,12 @@ class JarFilterTransform extends Transform {
 
         final JarFilters.FileFilter filter = filters.getFileFilter(jarInput.name)
 
+        if (filter == null) {
+            // No matched jar filters
+            FileUtils.copyFile(jarInput.file, outJarFile)
+            return
+        }
+
         new ZipInputStream(new FileInputStream(jarInput.file)).withCloseable { zis ->
             new ZipOutputStream(new FileOutputStream(outJarFile)).withCloseable { zos ->
 
@@ -140,6 +146,7 @@ class JarFilterTransform extends Transform {
                     zos.putNextEntry(entry)
                     ByteStreams.copy(zis, zos)
                     zos.closeEntry()
+                    zis.closeEntry()
                 }
             }
         }

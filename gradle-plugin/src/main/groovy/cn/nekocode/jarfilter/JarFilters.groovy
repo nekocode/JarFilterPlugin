@@ -40,7 +40,11 @@ class JarFilters {
                 .map { it.right() }
                 .collect()
 
-        return new FileFilter(matchedMatchers)
+        if (matchedMatchers.size() == 0) {
+            return null
+        } else {
+            return new FileFilter(matchedMatchers)
+        }
     }
 
 
