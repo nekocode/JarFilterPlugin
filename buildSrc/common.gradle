@@ -16,48 +16,14 @@
 
 apply plugin: 'groovy'
 
-repositories {
-    jcenter()
-    google()
-}
-
-dependencies {
-    compileOnly gradleApi()
-    compileOnly localGroovy()
-    compileOnly "com.android.tools.build:gradle:3.1.2"
-}
-
 compileGroovy {
     sourceCompatibility = "1.7"
     targetCompatibility = "1.7"
     options.encoding = "UTF-8"
 }
 
-apply plugin: 'com.github.dcendents.android-maven'
-
-group='com.github.nekocode'
-archivesBaseName='JarFilterPlugin'
-
-if (rootProject.file("local").exists()) {
-    version='local'
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: uri('.maven'))
-            }
-        }
-
-        finalizedBy(clean)
-    }
-}
-
-// build a jar with source files
-task sourcesJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourcesJar
-}
+ext.allDependencies = [
+        dependencies.gradleApi(),
+        dependencies.localGroovy(),
+        "com.android.tools.build:gradle:3.1.3"
+]

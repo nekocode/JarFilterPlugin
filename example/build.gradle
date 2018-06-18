@@ -1,17 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jar-filter'
 
-buildscript {
-    repositories {
-        maven { url project(':gradle-plugin').file('.maven').toURI() }
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.nekocode:JarFilterPlugin:local'
-    }
-}
-
 jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
         excludes = [
