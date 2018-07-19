@@ -104,7 +104,13 @@ class JarFilterTransform extends Transform {
                             copyAndFilterJar(outputProvider, jarInput, filters)
                             break
                         case Status.REMOVED:
-                            FileUtils.deleteIfExists(outJar)
+                            final File outJarFile = outputProvider.getContentLocation(
+                                    jarInput.name,
+                                    jarInput.contentTypes,
+                                    jarInput.scopes,
+                                    Format.JAR
+                            )
+                            FileUtils.deleteIfExists(outJarFile)
                             break
                     }
 
