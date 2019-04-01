@@ -1,0 +1,26 @@
+apply plugin: "kotlin"
+apply plugin: 'jacoco'
+
+def srcProject = project(":buildSrc")
+
+def srcJava = srcProject.convention.findPlugin(JavaPluginConvention)
+sourceSets.main.java.srcDirs += srcJava.sourceSets.main.java.srcDirs
+sourceSets.main.resources.srcDirs += srcJava.sourceSets.main.resources.srcDirs
+
+srcProject.configurations.each { config ->
+    config.dependencies.each { dep ->
+        project.dependencies.add(config.name, dep)
+    }
+}
+
+dependencies {
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.3.21"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+check.dependsOn jacocoTestReport
