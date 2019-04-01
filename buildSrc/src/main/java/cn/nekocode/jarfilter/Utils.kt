@@ -16,9 +16,14 @@
 
 package cn.nekocode.jarfilter
 
-import com.google.common.annotations.VisibleForTesting
+import com.android.utils.FileUtils
 import groovy.json.JsonSlurper
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -36,7 +41,6 @@ object Utils {
         return null
     }
 
-    @VisibleForTesting
     fun getConfigsFromBytes(bytes: ByteArray): Set<JarFilterConfig> {
         val list = JsonSlurper().parse(bytes) as List<Map<String, Object>>
 
@@ -53,5 +57,40 @@ object Utils {
                     getSetField("excludes")
             )
         }.toSet()
+    }
+
+    fun copyAndFilterJar(
+            inJarFile: File,
+            outJarFile: File,
+            filter: JarFilter?) {
+
+        if (!inJarFile.exists()) {
+            return
+        }
+
+        if (filter == null) {
+            FileUtils.copyFile(inJarFile, outJarFile)
+            return
+        }
+
+        ZipInputStream(FileInputStream(inJarFile)).use { zis ->
+            ZipOutputStream(FileOutputStream(outJarFile)).use { zos ->
+                var i: ZipEntry?
+
+                while (zis.nextEntry.let { i = it; i != null }) {
+                    val entry = i ?: break
+
+                    if (!filter.test(entry.name)) {
+                        // Skip this file
+                        continue
+                    }
+
+                    zos.putNextEntry(entry)
+                    zis.copyTo(zos)
+                    zos.closeEntry()
+                    zis.closeEntry()
+                }
+            }
+        }
     }
 }

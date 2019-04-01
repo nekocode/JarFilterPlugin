@@ -19,16 +19,10 @@ package cn.nekocode.jarfilter
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
-import com.google.common.annotations.VisibleForTesting
 import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.util.regex.Pattern
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -102,41 +96,6 @@ class JarFilterTransform(private val project: Project) : Transform() {
             pattern.matcher(jarInput.name).matches()
         }?.second
 
-        copyAndFilterJar(jarInput.file, outJarFile, filter)
-    }
-
-    companion object {
-
-        @VisibleForTesting
-        fun copyAndFilterJar(
-                inJarFile: File,
-                outJarFile: File,
-                filter: JarFilter?) {
-
-            if (filter == null) {
-                FileUtils.copyFile(inJarFile, outJarFile)
-                return
-            }
-
-            ZipInputStream(FileInputStream(inJarFile)).use { zis ->
-                ZipOutputStream(FileOutputStream(outJarFile)).use { zos ->
-                    var i: ZipEntry?
-
-                    while (zis.nextEntry.let { i = it; i != null }) {
-                        val entry = i ?: break
-
-                        if (!filter.test(entry.name)) {
-                            // Skip this file
-                            continue
-                        }
-
-                        zos.putNextEntry(entry)
-                        zis.copyTo(zos)
-                        zos.closeEntry()
-                        zis.closeEntry()
-                    }
-                }
-            }
-        }
+        Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
     }
 }
