@@ -14,13 +14,48 @@
  * limitations under the License.
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21"
+        classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
+    }
+}
+
 repositories {
     google()
     jcenter()
 }
 
-apply from: file('common.gradle')
+apply plugin: "kotlin"
+apply plugin: "groovy"
 
-allDependencies.each {
-    dependencies.add('implementation', it)
+compileGroovy {
+    sourceCompatibility = "1.7"
+    targetCompatibility = "1.7"
+    options.encoding = "UTF-8"
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
+    implementation "com.android.tools.build:gradle:3.3.2"
+}
+
+apply plugin: "com.github.dcendents.android-maven"
+
+group="com.github.nekocode"
+archivesBaseName="JarFilterPlugin"
+libsDirName="output"
+
+// build a jar with source files
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = "sources"
+}
+
+artifacts {
+    archives sourcesJar
 }
