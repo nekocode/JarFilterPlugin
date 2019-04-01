@@ -1,5 +1,5 @@
 /*
- * Copyright 2018. nekocode (nekocode.cn@gmail.com)
+ * Copyright 2019. nekocode (nekocode.cn@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package cn.nekocode.jarfilter.example;
-
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+package cn.nekocode.jarfilter
 
 /**
- * @author nekocode
+ * @author nekocode (nekocode.cn@gmail.com)
  */
-public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
-}
+data class JarFilterConfig(
+        val name: String,
+        var includes: Set<String>,
+        var excludes: Set<String>
+)

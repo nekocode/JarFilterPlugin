@@ -30,13 +30,6 @@ repositories {
 }
 
 apply plugin: "kotlin"
-apply plugin: "groovy"
-
-compileGroovy {
-    sourceCompatibility = "1.7"
-    targetCompatibility = "1.7"
-    options.encoding = "UTF-8"
-}
 
 dependencies {
     implementation gradleApi()
@@ -48,7 +41,6 @@ apply plugin: "com.github.dcendents.android-maven"
 
 group="com.github.nekocode"
 archivesBaseName="JarFilterPlugin"
-libsDirName="output"
 
 // build a jar with source files
 task sourcesJar(type: Jar) {
