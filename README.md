@@ -1,5 +1,5 @@
 # README
-[![Apache 2.0 License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0.html) [![Release](https://jitpack.io/v/nekocode/JarFilterPlugin.svg)](https://jitpack.io/#nekocode/JarFilterPlugin)
+[![Build Status](https://travis-ci.com/nekocode/JarFilterPlugin.svg?branch=master)](https://travis-ci.com/nekocode/JarFilterPlugin) [![codecov](https://codecov.io/gh/nekocode/JarFilterPlugin/branch/master/graph/badge.svg)](https://codecov.io/gh/nekocode/JarFilterPlugin)
 
 This plugin can filter files (such as class files) inside a jar. This is very useful when you want to modify some classes in a third-party library but do not want to download and import all of its source code. Just copy the source files you want to modify into your project. And then use this plugin to remove the corresponding class in the jar. Finally, the build tool will package the compiled class of your copied source into the archive.
 
@@ -7,7 +7,7 @@ You can see the [example](example) to learn how to use it. In addition, this plu
 
 ## Intergation
 
-Intergate this gralde plugin:
+Replace the `${last-version}` in below code to number [![Release](https://jitpack.io/v/nekocode/JarFilterPlugin.svg)](https://jitpack.io/#nekocode/JarFilterPlugin) .
 
 ```gradle
 buildscript {
@@ -23,7 +23,7 @@ buildscript {
 Apply and configure the plugin:
 
 ```gralde
-apply plugin: 'jar-filter'
+apply plugin: "jar-filter"
 
 jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
