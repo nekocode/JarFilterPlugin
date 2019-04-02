@@ -17,6 +17,7 @@
 package cn.nekocode.jarfilter
 
 import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -37,15 +38,15 @@ class JarFilterPlugin : Plugin<Project> {
         }
         project.extensions.add(CONFIG_KEYWORD, jarFilters)
 
-        // Create a task to save config to json file before build
-        val updateTask = project.tasks.create(
-                UPDATE_CONFIG_TASK_NAME, UpdateConfigTask::class.java)
-        project.tasks.getByName("preBuild").dependsOn(updateTask)
-
-        // Register transform
-        val android = project.extensions.getByName("android") as BaseExtension?
-        if (android != null) {
+        val android = project.extensions.findByName("android") as BaseExtension?
+        if (android != null && android is BaseAppModuleExtension) {
+            // Register transform
             android.registerTransform(JarFilterTransform(project))
+
+            // Create a task to save config to json file before build
+            val updateTask = project.tasks.create(
+                    UPDATE_CONFIG_TASK_NAME, UpdateConfigTask::class.java)
+            project.tasks.getByName("preBuild").dependsOn(updateTask)
 
         } else {
             throw UnsupportedOperationException(
