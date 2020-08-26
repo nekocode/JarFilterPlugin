@@ -47,6 +47,7 @@ class JarFilterTransform(private val project: Project) : Transform() {
         val filters = configs.map {
             Pattern.compile(it.name) to JarFilter(it)
         }.toList()
+        println(filters)
 
         if (!invocation.isIncremental) {
             outputProvider.deleteAll()
@@ -90,6 +91,15 @@ class JarFilterTransform(private val project: Project) : Transform() {
                 jarInput.scopes,
                 Format.JAR
         )
+
+        if(jarInput.file.name.matches(Regex("\\d+.jar"))){
+            //被其他transform搞过了,已经没有包名之类的信息了
+            jarFilters.forEach {
+                var  filter = it.second
+                Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
+            }
+            return
+        }
 
         val filter = jarFilters.firstOrNull {
             val pattern = it.first

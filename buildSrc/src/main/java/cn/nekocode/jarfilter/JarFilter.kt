@@ -24,7 +24,7 @@ import java.util.regex.Pattern
  */
 class JarFilter(config: JarFilterConfig) : Predicate<String> {
     private val includes: List<Pattern> = config.includes.map { Pattern.compile(it) }
-    private val excludes: List<Pattern> = config.excludes.map { Pattern.compile(it) }
+     val excludes: List<Pattern> = config.excludes.map { Pattern.compile(it) }
 
     override fun test(name: String): Boolean {
         if (!includes.isEmpty()) {
@@ -46,6 +46,8 @@ class JarFilter(config: JarFilterConfig) : Predicate<String> {
                     return false
                 }
             }
+        }else{
+            println("excludes is empty")
         }
         return true
     }

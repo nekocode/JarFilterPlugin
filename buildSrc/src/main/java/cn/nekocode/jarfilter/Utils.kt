@@ -70,9 +70,11 @@ object Utils {
 
         if (filter == null) {
             FileUtils.copyFile(inJarFile, outJarFile)
+            println("filter == null,"+inJarFile.absolutePath)
             return
         }
-
+        //println("filter.excludes:"+filter.excludes)
+        //println("filter != null,"+inJarFile.absolutePath)
         ZipInputStream(FileInputStream(inJarFile)).use { zis ->
             ZipOutputStream(FileOutputStream(outJarFile)).use { zos ->
                 var i: ZipEntry?
@@ -82,6 +84,7 @@ object Utils {
 
                     if (!filter.test(entry.name)) {
                         // Skip this file
+                        println("file skipped success: "+entry.name +"  in aar:"+inJarFile.absolutePath)
                         continue
                     }
 

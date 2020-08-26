@@ -35,7 +35,6 @@ open class UpdateConfigTask: DefaultTask() {
     fun update() {
         val configs = project.extensions.getByName(JarFilterPlugin.CONFIG_KEYWORD)
                 as NamedDomainObjectContainer<JarFilterConfig>
-
         val configFile = File(project.buildDir, CONFIG_FILE_NAME)
         var needUpdate = !configFile.exists()
 

@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.sensorsdata.analytics.android'
 apply plugin: "jar-filter"
 
+//transforms/SensorsAnalyticsAutoTrack/debug/0.jar
 jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
         excludes = [
@@ -9,6 +11,7 @@ jarFilters {
         ]
     }
 }
+//apply plugin: 'com.sensorsdata.analytics.android'
 
 android {
     compileSdkVersion 28
