@@ -93,11 +93,9 @@ class JarFilterTransform(private val project: Project) : Transform() {
         )
 
         if(jarInput.file.name.matches(Regex("\\d+.jar"))){
-            //被其他transform搞过了,已经没有包名之类的信息了
-            jarFilters.forEach {
-                var  filter = it.second
-                Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
-            }
+            //被其他transform搞过了,已经没有包名之类的信息了,需要注意的是,Utils.copyAndFilterJar在一次中只调用一次
+            Utils.copyAndFilterJarIfNameNum(jarInput.file, outJarFile, jarFilters)
+            println("xx")
             return
         }
 

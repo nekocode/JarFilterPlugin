@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-apply plugin: 'com.sensorsdata.analytics.android'
+//apply plugin: 'com.sensorsdata.analytics.android'
 apply plugin: "jar-filter"
 
 //transforms/SensorsAnalyticsAutoTrack/debug/0.jar
@@ -7,17 +7,24 @@ jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
         excludes = [
                 "android/support/v7/app/AppCompatActivity.class",
-                'android/support/v7/app/AppCompatActivity\\$(.*).class'
+                "android/support/v7/app/AlertController.class"
+        ]
+    }
+    "com.github.skyNet2017:BitmapCanary:(.*)" {
+        excludes = [
+                "hexin/androidbitmapcanary/ActivityDrawableWatcher.class"
         ]
     }
 }
 //apply plugin: 'com.sensorsdata.analytics.android'
+//,
+//                'android/support/v7/app/AppCompatActivity\\$(.*).class'
 
 android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "cn.nekocode.jarfilter.example"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -36,4 +43,5 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:28.0.0"
+    implementation 'com.github.skyNet2017:BitmapCanary:1.1.0'
 }
