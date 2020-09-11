@@ -25,13 +25,13 @@ import java.util.regex.Pattern
 class JarFilter(config: JarFilterConfig) : Predicate<String> {
     private val includes: List<Pattern> = config.includes.map { Pattern.compile(it) }
      val excludes: List<Pattern> = config.excludes.map {
-         println("exclude rule class: "+it)
+         println("rule: exclude class: "+it)
         return@map Pattern.compile(it)
      }
 
     val excludesInnerClass = config.excludes.map {
         val str = it.replace(".class","\\$(.*).class")
-        println("auto exclude rule  innerclass: "+str)
+        println("rule :auto exclude innerclass: "+str)
        return@map Pattern.compile(str)
     }
 

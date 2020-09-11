@@ -63,19 +63,20 @@ object Utils {
     fun copyAndFilterJar(
             inJarFile: File,
             outJarFile: File,
-            filter: JarFilter?) {
+            filter: JarFilter?) : Boolean {
 
         if (!inJarFile.exists()) {
-            return
+            return false
         }
 
         if (filter == null) {
             FileUtils.copyFile(inJarFile, outJarFile)
-            println("filter == null,"+inJarFile.absolutePath)
-            return
+            //println("filter == null,"+inJarFile.absolutePath)
+            return false
         }
         //println("filter.excludes:"+filter.excludes)
         //println("filter != null,"+inJarFile.absolutePath)
+        var hasTarget = false
         ZipInputStream(FileInputStream(inJarFile)).use { zis ->
             ZipOutputStream(FileOutputStream(outJarFile)).use { zos ->
                 var i: ZipEntry?
@@ -86,6 +87,7 @@ object Utils {
                     if (!filter.test(entry.name)) {
                         // Skip this file
                         println("file skipped success: "+entry.name +"  in jar:"+inJarFile.absolutePath)
+                        hasTarget = true
                         continue
                     }
 
@@ -97,22 +99,24 @@ object Utils {
                 }
             }
         }
+       return hasTarget;
     }
 
     fun copyAndFilterJarIfNameNum(
             inJarFile: File,
             outJarFile: File,
-            jarFilters: List<Pair<Pattern, JarFilter>>) {
+            jarFilters: List<Pair<Pattern, JarFilter>>):Boolean {
 
         if (!inJarFile.exists()) {
-            return
+            return false
         }
 
         if (jarFilters.isEmpty()) {
             FileUtils.copyFile(inJarFile, outJarFile)
-            println("filter == null,"+inJarFile.absolutePath)
-            return
+            //println("filter == null,"+inJarFile.absolutePath)
+            return false
         }
+        var hasTarget = false
         //println("filter.excludes:"+filter.excludes)
         //println("filter != null,"+inJarFile.absolutePath)
         ZipInputStream(FileInputStream(inJarFile)).use { zis ->
@@ -132,6 +136,7 @@ object Utils {
                     if(skip){
                         // Skip this file
                         println("file skipped success: "+entry.name +"  in jar:"+inJarFile.absolutePath)
+                        hasTarget = true;
                         continue
                     }
                     zos.putNextEntry(entry)
@@ -142,6 +147,7 @@ object Utils {
                 }
             }
         }
+        return hasTarget
     }
 
     private fun printFileCopy(inJarFile: File, outJarFile: File, entry: ZipEntry) {

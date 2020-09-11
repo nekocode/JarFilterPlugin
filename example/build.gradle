@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-//apply plugin: 'com.sensorsdata.analytics.android'
+//apply plugin: 'com.sensorsdata.analytics.android'//这里会导致jarinput.name为classes_d34e6c45字样,丢失掉了包名,垃圾神策
 apply plugin: "jar-filter"
 
 //transforms/SensorsAnalyticsAutoTrack/debug/0.jar
