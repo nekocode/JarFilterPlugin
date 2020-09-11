@@ -47,7 +47,9 @@ class JarFilterTransform(private val project: Project) : Transform() {
         val filters = configs.map {
             Pattern.compile(it.name) to JarFilter(it)
         }.toList()
+        println("------------------------------------")
         println(filters)
+        println("------------------------------------")
 
         if (!invocation.isIncremental) {
             outputProvider.deleteAll()
@@ -102,7 +104,7 @@ class JarFilterTransform(private val project: Project) : Transform() {
             // name一般是正确的,但有的蛋疼插件把name也搞掉了:变成了:classes_3ed48224,比如辣鸡神策
             var hasTarget =   Utils.copyAndFilterJarIfNameNum(jarInput.file, outJarFile, jarFilters)
             if(hasTarget){
-                println("the up list exclude in package: "+jarInput.toString())
+                println("the up list exclude in package: "+jarInput.toString()+"\n")
             }
             return
         }
@@ -118,7 +120,7 @@ class JarFilterTransform(private val project: Project) : Transform() {
 
        var hasTarget =  Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
         if(hasTarget){
-            println("the up list exclude in package: "+jarInput.name)
+            println("the up list exclude in package: "+jarInput.name+"\n")
         }
     }
 }
