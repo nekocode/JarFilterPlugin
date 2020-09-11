@@ -7,7 +7,7 @@ You can see the [example](example) to learn how to use it. In addition, this plu
 
 ## Intergation
 
-Replace the `${last-version}` in below code to number [![Release](https://jitpack.io/v/nekocode/JarFilterPlugin.svg)](https://jitpack.io/#nekocode/JarFilterPlugin) .
+Replace the `${last-version}` in below code to number[![](https://jitpack.io/v/skyNet2017/JarFilterPlugin.svg)](https://jitpack.io/#skyNet2017/JarFilterPlugin)
 
 ```gradle
 buildscript {
@@ -15,7 +15,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath "com.github.nekocode:JarFilterPlugin:${lastest-verion}"
+        classpath "com.github.skyNet2017:JarFilterPlugin:${lastest-verion}"
     }
 }
 ```
@@ -28,8 +28,13 @@ apply plugin: "jar-filter"
 jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
         excludes = [
-                'android/support/v7/app/AppCompatActivity.class',
-                'android/support/v7/app/AppCompatActivity\\$(.*).class'
+                "android/support/v7/app/AppCompatActivity.class",
+                "android/support/v7/app/AlertController.class"
+        ]
+    }
+    "com.github.skyNet2017:BitmapCanary:(.*)" {
+        excludes = [
+                "hexin/androidbitmapcanary/ActivityDrawableWatcher.class"
         ]
     }
 
@@ -41,3 +46,14 @@ jarFilters {
     }
 }
 ```
+
+* 自动帮你忽略内部类,匿名内部类
+
+* 提供丰富直观的日志:
+
+![image-20200911152711302](http://hss01248.tech/uPic/2020-09-11-15-27-11-image-20200911152711302.png)
+
+
+
+![image-20200911152632986](http://hss01248.tech/uPic/2020-09-11-15-26-33-image-20200911152632986.png)
+
