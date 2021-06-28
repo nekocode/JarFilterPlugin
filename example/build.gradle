@@ -1,21 +1,31 @@
 apply plugin: "com.android.application"
+//apply plugin: 'com.sensorsdata.analytics.android'//这里会导致jarinput.name为classes_d34e6c45字样,丢失掉了包名,垃圾神策
 apply plugin: "jar-filter"
 
+//transforms/SensorsAnalyticsAutoTrack/debug/0.jar
 jarFilters {
     "com.android.support:appcompat-v7:(.*)" {
         excludes = [
                 "android/support/v7/app/AppCompatActivity.class",
-                'android/support/v7/app/AppCompatActivity\\$(.*).class'
+                "android/support/v7/app/AlertController.class"
+        ]
+    }
+    "com.github.skyNet2017:BitmapCanary:(.*)" {
+        excludes = [
+                "hexin/androidbitmapcanary/ActivityDrawableWatcher.class"
         ]
     }
 }
+//apply plugin: 'com.sensorsdata.analytics.android'
+//,
+//                'android/support/v7/app/AppCompatActivity\\$(.*).class'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
         applicationId "cn.nekocode.jarfilter.example"
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 16
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
@@ -23,6 +33,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+        debug{
+            minifyEnabled true
         }
     }
     lintOptions {
@@ -33,4 +46,5 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:28.0.0"
+    implementation 'com.github.skyNet2017:BitmapCanary:1.1.0'
 }

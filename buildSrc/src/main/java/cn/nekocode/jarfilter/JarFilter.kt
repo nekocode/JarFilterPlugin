@@ -24,13 +24,25 @@ import java.util.regex.Pattern
  */
 class JarFilter(config: JarFilterConfig) : Predicate<String> {
     private val includes: List<Pattern> = config.includes.map { Pattern.compile(it) }
-    private val excludes: List<Pattern> = config.excludes.map { Pattern.compile(it) }
+     val excludes: List<Pattern> = config.excludes.map {
+         println("rule: exclude class: "+it)
+        return@map Pattern.compile(it)
+     }
 
-    override fun test(name: String): Boolean {
+    val excludesInnerClass = config.excludes.map {
+        val str = it.replace(".class","\\$(.*).class")
+        println("rule :auto exclude innerclass: "+str)
+       return@map Pattern.compile(str)
+    }
+
+    /**
+     * 是否要保留传入的类
+     */
+    override fun test(classpath: String): Boolean {
         if (!includes.isEmpty()) {
             var isInclude = false
             for (pattern in includes) {
-                if (pattern.matcher(name).matches()) {
+                if (pattern.matcher(classpath).matches()) {
                     isInclude = true
                     break
                 }
@@ -42,10 +54,19 @@ class JarFilter(config: JarFilterConfig) : Predicate<String> {
 
         if (!excludes.isEmpty()) {
             for (pattern in excludes) {
-                if (pattern.matcher(name).matches()) {
+                if (pattern.matcher(classpath).matches()) {
                     return false
                 }
             }
+            for (pattern in excludesInnerClass) {
+                if (pattern.matcher(classpath).matches()) {
+                    return false
+                }
+                //内部类的判断:$(.*).class
+            }
+
+        }else{
+            println("excludes is empty")
         }
         return true
     }

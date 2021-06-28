@@ -47,6 +47,9 @@ class JarFilterTransform(private val project: Project) : Transform() {
         val filters = configs.map {
             Pattern.compile(it.name) to JarFilter(it)
         }.toList()
+        println("------------------------------------")
+        println(filters)
+        println("------------------------------------")
 
         if (!invocation.isIncremental) {
             outputProvider.deleteAll()
@@ -91,11 +94,33 @@ class JarFilterTransform(private val project: Project) : Transform() {
                 Format.JAR
         )
 
+        //println(jarInput)
+
+        //ImmutableJarInput{name=classes_416c009e, file=/Users/hss/github/JarFilterPlugin/example/build
+        // /intermediates/transforms/SensorsAnalyticsAutoTrack/debug/32.jar, contentTypes=CLASSES, scopes=EXTERNAL_LIBRARIES, status=NOTCHANGED}
+
+        if(!jarInput.name.contains(":")){//jarInput.file.name.matches(Regex("\\d+.jar"))
+            //被其他transform搞过了,已经没有包名之类的信息了,需要注意的是,Utils.copyAndFilterJar在一次中只调用一次.
+            // name一般是正确的,但有的蛋疼插件把name也搞掉了:变成了:classes_3ed48224,比如辣鸡神策
+            var hasTarget =   Utils.copyAndFilterJarIfNameNum(jarInput.file, outJarFile, jarFilters)
+            if(hasTarget){
+                println("-->the up list exclude in package: "+jarInput.toString()+"\n")
+            }
+            return
+        }
+
+        //ImmutableJarInput{name=com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.47, file=/Users/hss/.gradle/caches/transforms-1/files-1.1/
+        // BaseRecyclerViewAdapterHelper-2.9.47.aar/3a7b553ec8dbf8ec3418b5d3c3f9b922/jars/classes.jar, contentTypes=CLASSES, scopes=EXTERNAL_LIBRARIES, status=NOTCHANGED}
+        //filter == null,/Users/hss/.gradle/caches/transforms-1/files-1.1/BaseRecyclerViewAdapterHelper-2.9.47.aar/3a7b553ec8dbf8ec3418b5d3c3f9b922/jars/classes.jar
+
         val filter = jarFilters.firstOrNull {
             val pattern = it.first
             pattern.matcher(jarInput.name).matches()
         }?.second
 
-        Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
+       var hasTarget =  Utils.copyAndFilterJar(jarInput.file, outJarFile, filter)
+        if(hasTarget){
+            println("-->the up list exclude in package: "+jarInput.name+"\n")
+        }
     }
 }
