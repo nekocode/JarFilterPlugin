@@ -1,1 +1,1 @@
-include ":buildSrc", ":test", ":example"
+include  ":example"//":buildSrc",
